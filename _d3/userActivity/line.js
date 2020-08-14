@@ -1,38 +1,9 @@
 async function drawLineChart() {
-	// 1. Access data
-
-	// let dataset = await d3.json('./../../../nyc_weather_data.json');
-	let dataset = await d3.json('./../data/nyc_weather_data.json');
-	let dmlData = [];
-
-	dataset.forEach((data) => {
-		dmlData.push({
-			date: data.date,
-			temperatureMax: data.temperatureMax
-		});
-	});
-
-	dataset = dmlData;
-
+	const dataset = await d3.json('./../../data/nyc_weather_data.json');
+	const dmlData = userActivity(dataset);
 	const yAccessor = (d) => d.temperatureMax;
 	const dateParser = d3.timeParse('%Y-%m-%d');
 	const xAccessor = (d) => dateParser(d.date);
-	dataset = dataset.sort((a, b) => xAccessor(a) - xAccessor(b)).slice(0, 100);
-
-	// 2. Create chart dimensions
-
-	let dimensions = {
-		width: window.innerWidth * 0.8,
-		height: 400,
-		margin: {
-			top: 15,
-			right: 15,
-			bottom: 40,
-			left: 60
-		}
-	};
-	dimensions.boundedWidth = dimensions.width - dimensions.margin.left - dimensions.margin.right;
-	dimensions.boundedHeight = dimensions.height - dimensions.margin.top - dimensions.margin.bottom;
 
 	// 3. Draw canvas
 
@@ -128,7 +99,6 @@ async function drawLineChart() {
 		const formatDate = d3.timeFormat('%B %A %-d, %Y');
 		tooltip.select('#date').text(formatDate(closestXValue));
 
-		// const formatTemperature = (d) => `${d3.format('.1f')(d)}°F`;
 		tooltip.select('#temperature').html(Math.floor(closestYValue));
 
 		const x = xScale(closestXValue) + dimensions.margin.left;
