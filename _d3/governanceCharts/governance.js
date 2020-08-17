@@ -1,10 +1,24 @@
 async function drawGovernanceChart() {
-	const data = [
-		{ status: 'warn', value: 12 },
-		{ status: 'pass', value: 23 },
-		{ status: 'fail', value: 34 },
-		{ status: 'error', value: 19 }
+	const initData = [
+		{ category: 'bus', status: 'fail', value: 34 },
+		{ category: 'third', status: 'fail', value: 12 },
+		{ category: 'sys', status: 'fail', value: 10 },
+		{ category: 'other', status: 'fail', value: 20 },
+		{ category: 'sys', status: 'warn', value: 12 },
+		{ category: 'bus', status: 'warn', value: 12 },
+		{ category: 'third', status: 'warn', value: 21 },
+		{ category: 'other', status: 'warn', value: 40 },
+		{ category: 'bus', status: 'pass', value: 18 },
+		{ category: 'sys', status: 'pass', value: 15 },
+		{ category: 'third', status: 'pass', value: 3 },
+		{ category: 'other', status: 'pass', value: 30 },
+		{ category: 'sys', status: 'error', value: 19 },
+		{ category: 'third', status: 'error', value: 12 },
+		{ category: 'bus', status: 'error', value: 22 },
+		{ category: 'other', status: 'error', value: 10 }
 	];
+
+	let data = initData.filter((d) => d.category === 'bus');
 
 	const statuses = data.map((d) => d.status).sort().reduce((prev, curr) => {
 		if (prev.indexOf(curr) === -1) prev.push(curr);
@@ -22,17 +36,17 @@ async function drawGovernanceChart() {
 		return found ? found.color : 'black';
 	};
 
-	const y = d3
-		.scaleBand()
-		.domain(statuses)
-		.range([ 0, dimensions.height - dimensions.margin.top - dimensions.margin.bottom ])
-		.padding(0.2);
-
 	const x = d3
 		.scaleLinear()
 		.domain([ 0, d3.max(data, (d) => d.value) ])
 		.range([ 0, dimensions.width - dimensions.margin.left - dimensions.margin.right ])
 		.nice();
+
+	const y = d3
+		.scaleBand()
+		.domain(statuses)
+		.range([ 0, dimensions.height - dimensions.margin.top - dimensions.margin.bottom ])
+		.padding(0.2);
 
 	let svg = d3.select('#wrapper').append('svg').attr('width', dimensions.width).attr('height', dimensions.height);
 	let bounds = svg
@@ -61,13 +75,14 @@ async function drawGovernanceChart() {
 		.attr('class', 'y-axis-label')
 		.attr('x', -dimensions.boundedHeight / 2)
 		.attr('y', -dimensions.margin.left + 10)
-		.html('Categories');
+		.html('Rules');
 
 	// Draw the bars.
 	bounds
 		.selectAll('rect')
 		.data(data)
 		.join('rect')
+		.attr('class', 'rectangle')
 		.attr('fill', (d) => color(d.status))
 		.attr('x', 0)
 		.attr('y', (d) => y(d.status))
@@ -99,5 +114,55 @@ async function drawGovernanceChart() {
 		.style('border-radius', '4px')
 		.style('color', '#fff')
 		.text('a simple tooltip');
+
+	const elements = [ 'Business Capability', 'System (IT)', '3rd Party', 'Other' ];
+
+	const selector = d3.select('#drop').append('select').attr('id', 'dropdown').on('change', function(d) {
+		selection = document.getElementById('dropdown');
+		let category, data;
+
+		if (selection.value === 'Business Capability') {
+			category = 'bus';
+		} else if (selection.value === '3rd Party') {
+			category = 'third';
+		} else if (selection.value === 'System (IT)') {
+			category = 'sys';
+		} else {
+			category = 'other';
+		}
+
+		data = initData.filter((d) => d.category === category);
+
+		// scale x axis
+		x
+			.domain([ 0, d3.max(data, (d) => d.value) ])
+			.range([ 0, dimensions.width - dimensions.margin.left - dimensions.margin.right ])
+			.nice();
+
+		xAxis.call(xAxisGenerator);
+
+		// change bar value
+		d3
+			.selectAll('.rectangle')
+			.transition()
+			.attr('class', 'rectangle')
+			.attr('fill', (d) => color(d.status))
+			.attr('x', 0)
+			.attr('y', (d) => y(d.status))
+			.attr('width', (d) => x(d.value))
+			.attr('height', y.bandwidth());
+	});
+
+	selector
+		.selectAll('option')
+		.data(elements)
+		.enter()
+		.append('option')
+		.attr('value', function(d) {
+			return d;
+		})
+		.text(function(d) {
+			return d;
+		});
 }
 drawGovernanceChart();
