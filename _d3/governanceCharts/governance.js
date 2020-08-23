@@ -1,9 +1,11 @@
 async function drawGovernanceChart() {
+	const max = 40;
+	const min = 10;
 	const initData = [
-		{ category: 'bus', status: 'fail', value: 34 },
-		{ category: 'third', status: 'fail', value: 12 },
-		{ category: 'sys', status: 'fail', value: 10 },
-		{ category: 'other', status: 'fail', value: 20 },
+		{ category: 'bus', status: 'fail', value: Math.floor(Math.random() * (max - min + 1) + min) },
+		{ category: 'third', status: 'fail', value: Math.floor(Math.random() * (max - min + 1) + min) },
+		{ category: 'sys', status: 'fail', value: Math.floor(Math.random() * (max - min + 1) + min) },
+		{ category: 'other', status: 'fail', value: Math.floor(Math.random() * (max - min + 1) + min) },
 		{ category: 'sys', status: 'warn', value: 12 },
 		{ category: 'bus', status: 'warn', value: 12 },
 		{ category: 'third', status: 'warn', value: 21 },
@@ -115,22 +117,12 @@ async function drawGovernanceChart() {
 		.style('color', '#fff')
 		.text('a simple tooltip');
 
-	const elements = [ 'Business Capability', 'System (IT)', '3rd Party', 'Other' ];
+	const taxonomyElements = [ 'Business Capability', 'System (IT)', '3rd Party', 'Other' ];
+	const ruleElements = [ 'URL Correction', 'Status Unverified', 'Missing Methods', 'Misc' ];
+	const lifecycleElements = [ 'In Progress', 'Request Approval', 'Approved', 'Deprecated' ];
+	const ownerElements = [ 'Admin', 'Developer', 'Team1', 'Team2' ];
 
-	const selector = d3.select('#drop').append('select').attr('id', 'dropdown').on('change', function(d) {
-		selection = document.getElementById('dropdown');
-		let category, data;
-
-		if (selection.value === 'Business Capability') {
-			category = 'bus';
-		} else if (selection.value === '3rd Party') {
-			category = 'third';
-		} else if (selection.value === 'System (IT)') {
-			category = 'sys';
-		} else {
-			category = 'other';
-		}
-
+	const reDrawBars = (category) => {
 		data = initData.filter((d) => d.category === category);
 
 		// scale x axis
@@ -151,18 +143,103 @@ async function drawGovernanceChart() {
 			.attr('y', (d) => y(d.status))
 			.attr('width', (d) => x(d.value))
 			.attr('height', y.bandwidth());
+	};
+
+	const taxonomySelector = d3.select('#drop').append('select').attr('id', 'dropdown1').on('change', function(d) {
+		selection = document.getElementById('dropdown1');
+		let category;
+
+		switch (selection.value) {
+			case taxonomyElements[0]:
+				category = 'bus';
+				break;
+			case taxonomyElements[1]:
+				category = 'third';
+				break;
+			case taxonomyElements[2]:
+				category = 'sys';
+				break;
+			case taxonomyElements[3]:
+				category = 'other';
+				break;
+		}
+
+		reDrawBars(category);
 	});
 
-	selector
-		.selectAll('option')
-		.data(elements)
-		.enter()
-		.append('option')
-		.attr('value', function(d) {
-			return d;
-		})
-		.text(function(d) {
-			return d;
-		});
+	const ruleSelector = d3.select('#drop2').append('select').attr('id', 'dropdown2').on('change', function(d) {
+		selection = document.getElementById('dropdown2');
+		let category;
+
+		switch (selection.value) {
+			case ruleElements[0]:
+				category = 'bus';
+				break;
+			case ruleElements[1]:
+				category = 'third';
+				break;
+			case ruleElements[2]:
+				category = 'sys';
+				break;
+			case ruleElements[3]:
+				category = 'other';
+				break;
+		}
+
+		reDrawBars(category);
+	});
+
+	const lifecycleSelector = d3.select('#drop3').append('select').attr('id', 'dropdown3').on('change', function(d) {
+		selection = document.getElementById('dropdown3');
+		let category;
+
+		switch (selection.value) {
+			case lifecycleElements[0]:
+				category = 'bus';
+				break;
+			case lifecycleElements[1]:
+				category = 'third';
+				break;
+			case lifecycleElements[2]:
+				category = 'sys';
+				break;
+			case lifecycleElements[3]:
+				category = 'other';
+				break;
+		}
+
+		reDrawBars(category);
+	});
+
+	const ownerSelector = d3.select('#drop4').append('select').attr('id', 'dropdown4').on('change', function(d) {
+		selection = document.getElementById('dropdown4');
+		let category;
+
+		switch (selection.value) {
+			case ownerElements[0]:
+				category = 'bus';
+				break;
+			case ownerElements[1]:
+				category = 'third';
+				break;
+			case ownerElements[2]:
+				category = 'sys';
+				break;
+			case ownerElements[3]:
+				category = 'other';
+				break;
+		}
+
+		reDrawBars(category);
+	});
+
+	const setSelector = (selector, elements) => {
+		selector.selectAll('option').data(elements).enter().append('option').attr('value', (d) => d).text((d) => d);
+	};
+
+	setSelector(taxonomySelector, taxonomyElements);
+	setSelector(ruleSelector, ruleElements);
+	setSelector(lifecycleSelector, lifecycleElements);
+	setSelector(ownerSelector, ownerElements);
 }
 drawGovernanceChart();
