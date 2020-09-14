@@ -117,7 +117,7 @@ async function drawGovernanceChart() {
 		.style('color', '#fff')
 		.text('a simple tooltip');
 
-	const taxonomyElements = [ 'Business Capability', 'System (IT)', '3rd Party', 'Other' ];
+	const taxonomyElements = [ 'Credit/Charge Card', 'Account Management', 'Payment Execution', 'Transaction Engine' ];
 	const ruleElements = [ 'URL Correction', 'Status Unverified', 'Missing Methods', 'Misc' ];
 	const lifecycleElements = [ 'In Progress', 'Request Approval', 'Approved', 'Deprecated' ];
 	const ownerElements = [ 'Admin', 'Developer', 'Team1', 'Team2' ];
