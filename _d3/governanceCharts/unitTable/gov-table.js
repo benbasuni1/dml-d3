@@ -79,47 +79,14 @@ async function drawTable() {
 	const dateAccessor = (d) => dateParser(d.date);
 	let dataset = mockData;
 	dataset = dataset.sort((a, b) => dateAccessor(a) - dateAccessor(b));
-
 	const table = d3.select('#table');
-
-	const dateFormat = (d) => d3.timeFormat('%-m/%d')(dateParser(d));
-	const hourFormat = (d) => d3.timeFormat('%-I %p')(new Date(d * 1000));
-	const format24HourTime = (d) => +d3.timeFormat('%H')(new Date(d * 1000));
-
 	const numberOfRows = 60;
-	const colorScale = d3.interpolateHcl('#a5c3e8', '#efa8a1');
-	const grayColorScale = d3.interpolateHcl('#fff', '#bdc4ca');
-	const tempScale = d3
-		.scaleLinear()
-		.domain(d3.extent(dataset.slice(0, numberOfRows), (d) => d.temperatureMax))
-		.range([ 0, 1 ]);
-	const timeScale = d3.scaleLinear().domain([ 0, 24 ]).range([ 0, 80 ]);
-	const humidityScale = d3
-		.scaleLinear()
-		.domain(d3.extent(dataset.slice(0, numberOfRows), (d) => d.windSpeed))
-		.range([ 0, 1 ]);
 
 	const columns = [
-		{ label: 'Name', type: 'date', format: (d) => dateFormat(d.date) },
-		{ label: 'Version', type: 'text', format: (d) => d.summary },
-		{
-			label: 'Rule Aggregate',
-			type: 'number',
-			format: (d) => d3.format('.1f')(d.temperatureMax),
-			background: (d) => colorScale(tempScale(d.temperatureMax))
-		},
-		{
-			label: 'Governance Rule',
-			type: 'marker',
-			format: (d) => '|',
-			transform: (d) => `translateX(${timeScale(format24HourTime(d.apparentTemperatureMaxTime))}%)`
-		},
-		{
-			label: 'Owner',
-			type: 'number',
-			format: (d) => d3.format('.2f')(d.windSpeed),
-			background: (d) => grayColorScale(humidityScale(d.windSpeed))
-		}
+		{ label: 'Name', type: 'text', format: (d) => d.name },
+		{ label: 'Version', type: 'text', format: (d) => d.version },
+		{ label: 'Governance Rule', type: 'text', format: (d) => d.rule },
+		{ label: 'Owner', type: 'text', format: (d) => d.owner }
 	];
 
 	table
